@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 })
 
 // carregar rutes
-// const userRoutes = require('./routes/user')
+const userRoutes = require('./routes/user')
 
 // middlewares
 
@@ -26,6 +26,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // rutes
-// app.use('/api/user', userRoutes)
+app.use('/api/user', userRoutes)
 
 module.exports = app
