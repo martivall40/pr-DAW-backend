@@ -51,26 +51,40 @@ router.post('/login', (req, res, next) => {
 // registrar
 router.post('/signup', (req, res, next) => {
   console.log('signup')
-  bcrypt.hash(req.body.password, 10).then(hash => {
-    const user = new User({
-      email: req.body.email,
-      username: req.body.username,
-      password: hash
+
+  User.findOne({ email: req.body.email })
+    .then(user => {
+      if (user) {
+        return res.status(401).json({
+          message: 'Credentials error'
+        })
+      }
+
+      bcrypt.hash(req.body.password, 10).then(hash => {
+        const user = new User({
+          email: req.body.email,
+          username: req.body.username,
+          password: hash
+        })
+        user
+          .save()
+          .then(result => {
+            res.status(201).json({
+              message: 'User creat',
+              result
+            })
+          })
+          .catch(err => {
+            res.status(500).json({
+              message: 'Error creating user',
+              error: err
+            })
+          })
+      })
+
+
     })
-    user
-      .save()
-      .then(result => {
-        res.status(201).json({
-          message: 'User creat',
-          result
-        })
-      })
-      .catch(err => {
-        res.status(500).json({
-          error: err
-        })
-      })
-  })
+  
 })
 
 module.exports = router
