@@ -27,26 +27,28 @@ router.post('/login', (req, res, next) => {
       }
 
       fetchedUser = user
-      return bcrypt.compare(req.body.password, user.password)
-    })
-    .then(result => {
-      // crear token
-      const token = jwt.sign(
-        { email: fetchedUser.email, userId: fetchedUser._id },
-        secret,
-        { expiresIn: '1h' }
-      )
-      res.status(200).json({
-        token,
-        expiresIn: 3600
+      bcrypt.compare(req.body.password, user.password).then(result => {
+
+        const token = jwt.sign(
+          { email: fetchedUser.email, userId: fetchedUser._id },
+          secret,
+          { expiresIn: '1h' }
+        )
+        res.status(200).json({
+          token,
+          expiresIn: 3600
+        })
+      })
+
+      .catch(err => {
+        return res.status(500).json({
+          error: err
+        })
       })
     })
-    .catch(err => {
-      return res.status(500).json({
-        error: err
-      })
-    })
-})
+
+  })
+    
 
 // registrar
 router.post('/signup', (req, res, next) => {
