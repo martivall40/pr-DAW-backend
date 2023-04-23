@@ -16,8 +16,7 @@ router.post('/login', (req, res, next) => {
   console.log('login')
   let fetchedUser
   console.log(req.body.email)
-  console.log(req.body.username)
-  console.log(req.body.password)
+  // console.log(req.body.password)
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
@@ -28,16 +27,21 @@ router.post('/login', (req, res, next) => {
 
       fetchedUser = user
       bcrypt.compare(req.body.password, user.password).then(result => {
-
-        const token = jwt.sign(
-          { email: fetchedUser.email, userId: fetchedUser._id },
-          secret,
-          { expiresIn: '1h' }
-        )
-        res.status(200).json({
-          token,
-          expiresIn: 3600
-        })
+        if(result){
+          const token = jwt.sign(
+            { email: fetchedUser.email, userId: fetchedUser._id },
+            secret,
+            { expiresIn: '1h' }
+          )
+          res.status(200).json({
+            token,
+            expiresIn: 3600
+          })
+        }else{
+          return res.status(401).json({
+            message: 'Auth failed'
+          })
+        }
       })
 
       .catch(err => {
