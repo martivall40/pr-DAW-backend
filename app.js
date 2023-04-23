@@ -3,6 +3,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 
+const scheduledFunctions = require('./scheduledFunctions/getPrice');
+
 const app = express()
 
 // a app.js CORS just abans de les rutes
@@ -27,5 +29,9 @@ app.use(bodyParser.json())
 
 // rutes
 app.use('/api/user', userRoutes)
+
+// carregar funcions programades
+scheduledFunctions.initScheduledJobs();
+
 
 module.exports = app
