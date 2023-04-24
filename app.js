@@ -31,7 +31,7 @@ app.use(bodyParser.json())
 app.use('/api/user', userRoutes)
 
 // carregar funcions programades
-scheduledFunctions.initScheduledJobs();
+scheduledFunctions.initScheduledJobs()
 
 
 module.exports = app

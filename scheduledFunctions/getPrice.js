@@ -7,22 +7,19 @@ const MongoClient = require('mongodb').MongoClient;
 
 const client = new MongoClient(uri);
 
-// const MongoClient = require('mongodb').MongoClient;
+var free = true
 
-
-// 15 3 * * * 3:15 AM
-
-exports.initScheduledJobs = () => {
-  const scheduledJobFunction = CronJob.schedule("* * * * *", async () => {
-    // console.log(new Date());
-    // Add your custom logic here
-
-    try {
+const actualitzarDades = async () => {
+  if(free){
+    free = false
+    
       // Connect to the MongoDB server
       await client.connect();
     
       const db = client.db();
       const dbName = db.databaseName;
+
+      // comprovar ultima dada
 
       const last = await client.db(dbName).collection('price').find().sort({date:-1}).limit(1).toArray()
 
@@ -36,7 +33,8 @@ exports.initScheduledJobs = () => {
         avui.getMonth() === data.getMonth() &&
         avui.getDate() === data.getDate()
 
-        fer = (same)? false : true
+        console.log("> Proces: Mateix dia:",same)
+        fer = !same
 
       } else {
         // console.log('No documents found.');
@@ -45,7 +43,7 @@ exports.initScheduledJobs = () => {
 
       if(fer) {
 
-        console.log("add price")
+        console.log("> Proces: Afegint dades...")
         console.log(new Date());
 
 
@@ -98,7 +96,7 @@ exports.initScheduledJobs = () => {
 
         const link = `https://quickchart.io/chart?${taulaOp}&c=${JSON.stringify(taulaDades)}`
 
-
+        // guardar dades
 
         const result = await client.db(dbName).collection('price').insertOne({
           data: data,
@@ -106,20 +104,44 @@ exports.initScheduledJobs = () => {
           date: new Date(),
           link: link
         });
-        console.log(result.avg);
-              
 
+        console.log(result)  // problema: mira que fa aixo
+
+        console.log("> proces: Noves dades actualitzades")
+        console.log("> proces: Preu avg:", result.avg) // problema: undefined
+        console.log("> proces: ID:", result.insertedId)
 
       }
-      
-
-  
+       
       // Close the database connection
       await client.close();
+      
+     free = true
+  }
+}
+
+actualitzarDades()
+
+// 15 3 * * * 3:15 AM
+
+exports.initScheduledJobs = () => {
+  const scheduledJobFunction = CronJob.schedule("10-20 3 * * *", async () => {
+
+    try {
+      console.log("\n\n#--------------------- AUTOMATIC PROCESS -------------------------------------------#")
+      console.log("> Proces automatic: Hora actual")
+      console.log(new Date())
+      console.log(new Date().toLocaleString())
+
+      actualitzarDades()
+
+
     } catch (error) {
       console.error(error);
+      // free = true
     }
   });
 
   scheduledJobFunction.start();
 }
+
