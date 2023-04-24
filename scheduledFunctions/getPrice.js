@@ -28,13 +28,15 @@ const actualitzarDades = async () => {
       if (last.length > 0) {
         const data = last[0].date
         const avui = new Date()
-        
+                
+        if (data){
         const same = avui.getFullYear() === data.getFullYear() &&
         avui.getMonth() === data.getMonth() &&
         avui.getDate() === data.getDate()
 
         console.log("> Proces: Mateix dia:",same)
         fer = !same
+        }
 
       } else {
         // console.log('No documents found.');
@@ -98,17 +100,14 @@ const actualitzarDades = async () => {
 
         // guardar dades
 
-        const result = await client.db(dbName).collection('price').insertOne({
+        const result = await client.db(dbName).collection('prices').insertOne({
           data: data,
           avg: preuAVG,
           date: new Date(),
           link: link
         });
 
-        console.log(result)  // problema: mira que fa aixo
-
         console.log("> proces: Noves dades actualitzades")
-        console.log("> proces: Preu avg:", result.avg) // problema: undefined
         console.log("> proces: ID:", result.insertedId)
 
       }
