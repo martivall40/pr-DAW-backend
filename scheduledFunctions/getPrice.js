@@ -21,14 +21,14 @@ const actualitzarDades = async () => {
 
       // comprovar ultima dada
 
-      const last = await client.db(dbName).collection('price').find().sort({date:-1}).limit(1).toArray()
+      const last = await client.db(dbName).collection('prices').find().sort({date:-1}).limit(1).toArray()
 
       let fer = false
 
       if (last.length > 0) {
         const data = last[0].date
         const avui = new Date()
-
+        
         const same = avui.getFullYear() === data.getFullYear() &&
         avui.getMonth() === data.getMonth() &&
         avui.getDate() === data.getDate()

@@ -11,11 +11,11 @@ const port = process.env.PORT
 mongoose.Promise = global.Promise
 mongoose.connect(connString)
   .then(() => {
-    console.log('db conectada')
+    console.log('> Server: db connected')
 
     // server
     app.listen(port, () => {
-      console.log(`servidor port: ${port}`)
+      console.log(`> Server: server on port ${port}`)
     })
   })
   .catch(err => {

@@ -13,7 +13,7 @@ const router = express.Router()
 
 // login
 router.post('/login', (req, res, next) => {
-  console.log('login')
+  console.log('> Login:',req.params.email)
   let fetchedUser
   console.log(req.body.email)
   // console.log(req.body.password)
@@ -56,7 +56,7 @@ router.post('/login', (req, res, next) => {
 
 // registrar
 router.post('/signup', (req, res, next) => {
-  console.log('signup')
+  console.log('> Signup:',req.body.email)
 
   User.findOne({ email: req.body.email })
     .then(user => {

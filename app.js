@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 
 // carregar rutes
 const userRoutes = require('./routes/user')
+const priceRoutes = require('./routes/price')
 
 // middlewares
 
@@ -29,6 +30,7 @@ app.use(bodyParser.json())
 
 // rutes
 app.use('/api/user', userRoutes)
+app.use('/api/price', priceRoutes)
 
 // carregar funcions programades
 scheduledFunctions.initScheduledJobs()
