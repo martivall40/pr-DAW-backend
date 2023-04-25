@@ -30,12 +30,12 @@ const actualitzarDades = async () => {
         const avui = new Date()
                 
         if (data){
-        const same = avui.getFullYear() === data.getFullYear() &&
-        avui.getMonth() === data.getMonth() &&
-        avui.getDate() === data.getDate()
+          const same = avui.getFullYear() === data.getFullYear() &&
+          avui.getMonth() === data.getMonth() &&
+          avui.getDate() === data.getDate()
 
-        console.log("> Proces: Mateix dia:",same)
-        fer = !same
+          console.log("> Proces: Mateix dia:",same)
+          fer = !same
         }
 
       } else {
@@ -46,7 +46,7 @@ const actualitzarDades = async () => {
       if(fer) {
 
         console.log("> Proces: Afegint dades...")
-        console.log(new Date());
+        console.log(new Date().toLocaleString());
 
 
         
