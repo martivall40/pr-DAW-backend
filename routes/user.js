@@ -13,7 +13,7 @@ const router = express.Router()
 
 // login
 router.post('/login', (req, res, next) => {
-  console.log('> Login:',req.params.email)
+  console.log('> Login:',req.body.email)
   let fetchedUser
   console.log(req.body.email)
   // console.log(req.body.password)
