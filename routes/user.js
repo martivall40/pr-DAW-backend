@@ -15,7 +15,7 @@ const router = express.Router()
 router.post('/login', (req, res, next) => {
   console.log('> Login:',req.body.email)
   let fetchedUser
-  console.log(req.body.email)
+  // console.log(req.body.email)
   // console.log(req.body.password)
   User.findOne({ email: req.body.email })
     .then(user => {

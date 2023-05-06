@@ -1,0 +1,8 @@
+POST http://localhost:3000/api/home/create
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDIwQGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ5NDdmN2MyYjJjNTU0N2NjZjM5NGIiLCJpYXQiOjE2ODMzNjM0NDgsImV4cCI6MTY4MzM2NzA0OH0.qPTlsE6oTvx3pUTmG0b48Vo-OD82jJLXjCn5pArWsjc
+Content-Type: application/json; charset=utf-8
+
+{
+  "name": "casa1",
+  "type": "Home"
+}
