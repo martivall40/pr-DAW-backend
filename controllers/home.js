@@ -65,17 +65,55 @@ const controller = {
     })
   },
 
-  updateHome: function (req, res) {
+
+  getHome: function (req, res) {
+
     const homeId = req.params.id
-    const update = req.body
+    const userId = req.userId
+    User.findById(userId).then((user) => {
+      // console.log(user)
 
-    Home.findByIdAndUpdate(homeId, update, { new: true }, (err, homeUpdated) => {
-      if (err) return res.status(500).send({ message: 'Error actualizant les dades' })
+      if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
 
-      if (!homeUpdated) return res.status(404).send({ message: 'No existeix l\'ubicació' })
+      Home.find({user:userId,_id:homeId}).then((home) => {
+        
+        if (!home) return res.status(404).send({ message: 'L\'ubicació no existeix' })
 
-      return res.status(200).send({ home: homeUpdated })
+        return res.status(200).send({
+          home:home
+        })
+      }).catch((err) => {
+        console.error(err)
+        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        
+      })
+    }).catch((err) => {
+      // console.error(err)
+      return res.status(500).send({ message: "Usuari no existent" })
     })
+  },
+
+  updateHome: function (req, res) {
+    const userId = req.userId
+    const homeId = req.params.id
+    const name = req.body.name
+    const type = req.body.type
+
+    Home.findById(homeId).then((home) => {
+      // comprovar usuari
+      if (!home) return res.status(404).send({ message: 'No existeix l\'ubicació' })
+      if (userId != home.user) return res.status(401).send({ message: 'Prohibit' })
+
+      return Home.findByIdAndUpdate(homeId, {name:name,type:type}, { new: true })
+        .then(homeUpdated => {
+          if(!homeUpdated)  return res.status(404).send({ message: 'No existeix l\'ubicació' })
+          res.status(200).send({ home: homeUpdated })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al actualitzar l\'ubicació' }))
+
+    }).catch((err) => {
+      return res.status(500).send({ message: "Usuari no existent" })
+    })
+
   },
 
   deleteHome: function (req, res) {

@@ -1,0 +1,30 @@
+
+GET http://localhost:3000/api/home/64563f1ab42629d7d4ed5c16
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE5QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ1MGZiMjJiNTdjZTU3YzlhOGFlYjEiLCJpYXQiOjE2ODM0NTQ2MjIsImV4cCI6MTY4MzQ1ODIyMn0.ZYTYkU04mCyZ3UPPmP0x4KhjltxyQvqRSB68jIcx3bM
+
+###
+
+GET http://localhost:3000/api/home/64563f1ab42629d7d4ed5c16
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE3QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ0ZTFiYmU2ZWFjMzEzNjgyNmQ4ZTMiLCJpYXQiOjE2ODM0NTYxMjgsImV4cCI6MTY4MzQ1OTcyOH0.Lke8LCypAwJ7atnlNa8txltnkBTLTWmtWV66UqrpQq8
+
+###
+
+PUT http://localhost:3000/api/home/64578d380c5bf576c1dd9389
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE5QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ1MGZiMjJiNTdjZTU3YzlhOGFlYjEiLCJpYXQiOjE2ODM0NTg0MzEsImV4cCI6MTY4MzQ2MjAzMX0.ApRfTPiLe9jcC-NiQltWL4LxNQIF6m4DyAl1Moa2ltk
+Content-Type: application/json; charset=utf-8
+
+{
+  "name":"aixo2b219",
+  "type":"aixo3"
+}
+
+###
+
+PUT http://localhost:3000/api/home/64578d380c5bf576c1dd9389
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE3QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ0ZTFiYmU2ZWFjMzEzNjgyNmQ4ZTMiLCJpYXQiOjE2ODM0NTYxMjgsImV4cCI6MTY4MzQ1OTcyOH0.Lke8LCypAwJ7atnlNa8txltnkBTLTWmtWV66UqrpQq8
+Content-Type: application/json; charset=utf-8
+
+{
+  "name":"aixo12",
+  "type":"aixo3"
+}

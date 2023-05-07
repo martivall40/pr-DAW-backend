@@ -14,7 +14,7 @@ router.post('/create', checkToken, HomeController.createHome)
 router.get('/all', checkToken, HomeController.getHomes)
 
 router.put('/:id?', checkToken, HomeController.updateHome)
-// router.get('/home/:id?', checkToken, HomeController.getHome)
+router.get('/:id?', checkToken, HomeController.getHome)
 router.delete('/:id?', checkToken, HomeController.deleteHome)
 
 module.exports = router
