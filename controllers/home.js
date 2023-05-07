@@ -8,7 +8,7 @@ const controller = {
   createHome: function (req, res) {
     
     const userId = req.userId
-    User.findById(userId).then((user,as) => {
+    User.findById(userId).then((user) => {
       // console.log(user)
 
       if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
@@ -18,20 +18,16 @@ const controller = {
       home.name = params.name
       home.type = params.type
       home.user = user
-      console.log("req.body")
-      console.log(req.body)
-      
-      return home.save()
-          .then(home => console.log('The home ' + home.screenName + ' has been added.'))
-          .catch(err => handleError(err))
-          .finally(() => home.db.close());
+
     
-      home.save((err, homeStored) => {
-        if (err) return res.status(500).send({ message: 'ha fallat al guardar una ubicació' })
-
+      home.save().then(homeStored => {
+        
         if (!homeStored) return res.status(404).send({ message: 'ha fallat al guardar una ubicació' })
-
+        
         return res.status(200).send({ home: homeStored })
+        
+      }).catch(err => {
+        return res.status(500).send({ message: 'ha fallat al guardar una ubicació' })
       })
 
 
@@ -44,17 +40,28 @@ const controller = {
 
   },
   getHomes: function (req, res) {
-    Home.find({}).then((home) => {
-      
-      if (!home) return res.status(404).send({ message: 'L\'ubicació no existeix' })
 
-      return res.status(200).send({
-        home
+    const userId = req.userId
+    User.findById(userId).then((user) => {
+      // console.log(user)
+
+      if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
+
+      Home.find({user:userId}).then((home) => {
+        
+        if (!home) return res.status(404).send({ message: 'L\'ubicació no existeix' })
+
+        return res.status(200).send({
+          home
+        })
+      }).catch((err) => {
+        console.error(err)
+        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        
       })
     }).catch((err) => {
-      console.error(err)
-      return res.status(500).send({ message: "'error al retornar les dadesa" })
-      
+      // console.error(err)
+      return res.status(500).send({ message: "Usuari no existent" })
     })
   },
 
@@ -73,13 +80,24 @@ const controller = {
 
   deleteHome: function (req, res) {
     const homeId = req.params.id
-    Home.findByIdAndDelete(homeId, (err, homeRemoved) => {
-      if (err) return res.status(500).send({ message: "Error: no s'ha pogut borrar l\'ubicació" })
+    const userId = req.userId
 
-      if (!homeRemoved) return res.status(404).send({ message: 'No existeix l\'ubicació a borrar' })
+    Home.findById(homeId).then((home) => {
+      // comprovar usuari
+      if (!home) return res.status(404).send({ message: 'No existeix l\'ubicació' })
+      if (userId != home.user) return res.status(401).send({ message: 'Prohibit' })
 
-      return res.status(200).send({ home: homeRemoved })
+      return Home.findByIdAndDelete(homeId)
+        .then(homeRemoved => {
+          if(!homeRemoved)  return res.status(404).send({ message: 'No existeix l\'ubicació' })
+          res.status(200).send({ home: homeRemoved })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al borrar l\'ubicació' }))
+
+    }).catch((err) => {
+      return res.status(500).send({ message: "Usuari no existent" })
     })
+
+
   },
 
 }
