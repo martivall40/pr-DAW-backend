@@ -7,11 +7,14 @@ const deviceSchema = mongoose.Schema({
   virtual: {type: Boolean, default: true},
   home: {type: mongoose.Types.ObjectId, ref: "Home"},
 
-  deviceType: { type: mongoose.Types.ObjectId, refPath: "type"},
-  type: { type: String, required: true},
 
-  // provider: {type: mongoose.Types.ObjectId, refPath: "provider"},
-  // type: { type: String, required: true},
+  typeString: { type: String },
+  deviceType: { type: mongoose.Types.ObjectId, refPath: "type"}, // id document
+  type: { type: String, required: true, enum: ['deviceTypePlug']}, // deviceTypePlug
+
+  providerString: { type: String },
+  deviceProvider: {type: mongoose.Types.ObjectId, refPath: "provider"},
+  provider: { type: String, enum: ['tuya']},
 
 
 })
