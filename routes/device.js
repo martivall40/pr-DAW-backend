@@ -12,9 +12,10 @@ const router = express.Router()
 
 router.post('/create/:id', checkToken, DeviceController.createDevice)
 router.get('/all', checkToken, DeviceController.getDevices)
+router.get('/home/:id', checkToken, DeviceController.getDevicesByHome)
 
-// router.put('/:id?', checkToken, DeviceController.updateDevice)
+router.put('/:id?', checkToken, DeviceController.updateDevice)
 // router.get('/:id?', checkToken, DeviceController.getDevice)
-// router.delete('/:id?', checkToken, DeviceController.deleteDevice)
+router.delete('/:id?', checkToken, DeviceController.deleteDevice)
 
 module.exports = router

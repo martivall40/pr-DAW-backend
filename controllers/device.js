@@ -69,12 +69,18 @@ const controller = {
   getDevices: function (req, res) {
 
     const userId = req.userId
+    console.log(userId)
     User.findById(userId).then((user) => {
       // console.log(user)
 
       if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
 
-      Device.find({user:userId}).then((device) => {
+      
+        // Device.find().populate('home',null,{user:userId}).then((device) => {
+        Device.find().populate({ path: 'home', match:{user:  {$eq:userId}}  }).then((device) => {
+        // Device.find().populate('home', {path: 'home',match: { user: userId }}).then((device) => {
+
+        device = device.filter(dev=>dev.home!=null)
         
         if (!device) return res.status(404).send({ message: 'El dispositiu no existeix' })
   
@@ -83,7 +89,36 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        return res.status(500).send({ message: "'error al retornar les dades" })
+        
+      })
+    }).catch((err) => {
+      // console.error(err)
+      return res.status(500).send({ message: "Usuari no existent" })
+    })
+  },
+
+  getDevicesByHome: function (req, res) {
+    const homeId = req.params.id
+    const userId = req.userId
+    User.findById(userId).then((user) => {
+      // console.log(user)
+
+      if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
+
+      // Device.find({home:homeId}).then((device) => {
+        Device.find({home:homeId}).populate({ path: 'home', match:{user:  {$eq:userId}}  }).then((device) => {
+        
+        // device = device.filter(dev=>dev.home!=null);
+
+        if (!device) return res.status(404).send({ message: 'El dispositiu no existeix' })
+  
+        return res.status(200).send({
+          device
+        })
+      }).catch((err) => {
+        console.error(err)
+        return res.status(500).send({ message: "'error al retornar les dades" })
         
       })
     }).catch((err) => {
@@ -147,22 +182,22 @@ const controller = {
     })
   },
 
-  updateHome: function (req, res) {
+  updateDevice: function (req, res) {
     const userId = req.userId
-    const homeId = req.params.id
+    const deviceId = req.params.id
     const name = req.body.name
     const type = req.body.type
 
-    Home.findById(homeId).then((home) => {
+    Device.findById(deviceId).populate('home').then((device) => {
       // comprovar usuari
-      if (!home) return res.status(404).send({ message: 'No existeix l\'ubicació' })
+      if (!device) return res.status(404).send({ message: 'No existeix el dispositiu' })
       if (userId != home.user) return res.status(401).send({ message: 'Prohibit' })
 
-      return Home.findByIdAndUpdate(homeId, {name:name,type:type}, { new: true })
-        .then(homeUpdated => {
-          if(!homeUpdated)  return res.status(404).send({ message: 'No existeix l\'ubicació' })
-          res.status(200).send({ home: homeUpdated })})
-        .catch(err => res.status(500).send({ message: 'ha fallat al actualitzar l\'ubicació' }))
+      return Device.findByIdAndUpdate(deviceId, {name:name,type:type}, { new: true })
+        .then(deviceUpdated => {
+          if(!deviceUpdated)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+          res.status(200).send({ device: deviceUpdated })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al actualitzar el dispositiu' }))
 
     }).catch((err) => {
       return res.status(500).send({ message: "Usuari no existent" })
@@ -170,20 +205,20 @@ const controller = {
 
   },
 
-  deleteHome: function (req, res) {
-    const homeId = req.params.id
+  deleteDevice: function (req, res) {
+    const deviceId = req.params.id
     const userId = req.userId
 
-    Home.findById(homeId).then((home) => {
+    Device.findById(deviceId).populate('home').then((device) => {
       // comprovar usuari
-      if (!home) return res.status(404).send({ message: 'No existeix l\'ubicació' })
-      if (userId != home.user) return res.status(401).send({ message: 'Prohibit' })
+      if (!device) return res.status(404).send({ message: 'No existeix el dispositiu' })
+      if (userId != device.home.user) return res.status(401).send({ message: 'Prohibit' })
 
-      return Home.findByIdAndDelete(homeId)
-        .then(homeRemoved => {
-          if(!homeRemoved)  return res.status(404).send({ message: 'No existeix l\'ubicació' })
-          res.status(200).send({ home: homeRemoved })})
-        .catch(err => res.status(500).send({ message: 'ha fallat al borrar l\'ubicació' }))
+      return Device.findByIdAndDelete(deviceId)
+        .then(deviceRemoved => {
+          if(!deviceRemoved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+          res.status(200).send({ device: deviceRemoved })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
 
     }).catch((err) => {
       return res.status(500).send({ message: "Usuari no existent" })
