@@ -1,21 +1,8 @@
-POST http://localhost:3000/api/device/create/645fb2ab01bcfdada2c68abf
+Delete http://localhost:3000/api/device/6460d267697956df9ea04183
 authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDlAYXNkLmNvbSIsInVzZXJJZCI6IjY0NDRkOGYyZTZlYWMzMTM2ODI2ZDg5ZiIsImlhdCI6MTY4NDA2NDA4NywiZXhwIjoxNjg0MDY3Njg3fQ.CMPv60f3CDd-9242l3mLHD4FwQHklD3-KYyV_viTq6U
-Content-Type: application/json; charset=utf-8
-
-{
-  "name": "plug2",
-  "virtual": true,
-  "typeString": "Plug"
-}
 
 ###
 
-POST http://localhost:3000/api/device/create/645fb2d301bcfdada2c68ac4
+Delete http://localhost:3000/api/device/645bb1afa54974df03ef4e6e
 authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDlAYXNkLmNvbSIsInVzZXJJZCI6IjY0NDRkOGYyZTZlYWMzMTM2ODI2ZDg5ZiIsImlhdCI6MTY4NDA2NDA4NywiZXhwIjoxNjg0MDY3Njg3fQ.CMPv60f3CDd-9242l3mLHD4FwQHklD3-KYyV_viTq6U
-Content-Type: application/json; charset=utf-8
 
-{
-  "name": "bedPlug10",
-  "virtual": true,
-  "typeString": "Plug"
-}

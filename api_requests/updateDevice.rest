@@ -1,0 +1,21 @@
+PUT http://localhost:3000/api/device/6460d267697956df9ea04183
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE3QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ0ZTFiYmU2ZWFjMzEzNjgyNmQ4ZTMiLCJpYXQiOjE2ODM0NTYxMjgsImV4cCI6MTY4MzQ1OTcyOH0.Lke8LCypAwJ7atnlNa8txltnkBTLTWmtWV66UqrpQq8
+Content-Type: application/json; charset=utf-8
+
+{
+  "name": "bedPlug11",
+  "virtual": true,
+  "typeString": "Plug"
+}
+
+###
+
+PUT http://localhost:3000/api/device/645bb1afa54974df03ef4e6e
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZDE3QGFzZC5jb20iLCJ1c2VySWQiOiI2NDQ0ZTFiYmU2ZWFjMzEzNjgyNmQ4ZTMiLCJpYXQiOjE2ODM0NTYxMjgsImV4cCI6MTY4MzQ1OTcyOH0.Lke8LCypAwJ7atnlNa8txltnkBTLTWmtWV66UqrpQq8
+Content-Type: application/json; charset=utf-8
+
+{
+  "name": "bedPlug11",
+  "virtual": true,
+  "typeString": "Plug"
+}
