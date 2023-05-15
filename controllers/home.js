@@ -56,7 +56,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        return res.status(500).send({ message: "error al retornar les dades" })
         
       })
     }).catch((err) => {
@@ -84,7 +84,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        return res.status(500).send({ message: "error al retornar les dades" })
         
       })
     }).catch((err) => {

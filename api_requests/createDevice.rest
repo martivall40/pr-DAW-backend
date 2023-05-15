@@ -4,7 +4,7 @@ Content-Type: application/json; charset=utf-8
 
 {
   "name": "plug2",
-  "virtual": true,
+  "real": false,
   "typeString": "Plug"
 }
 
@@ -16,6 +16,6 @@ Content-Type: application/json; charset=utf-8
 
 {
   "name": "bedPlug10",
-  "virtual": true,
+  "real": false,
   "typeString": "Plug"
 }

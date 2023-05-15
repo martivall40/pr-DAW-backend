@@ -18,4 +18,4 @@ const tuyaSchema = mongoose.Schema({
 
 })
 
-module.exports = mongoose.model('Tuya', deviceSchema)
+module.exports = mongoose.model('Tuya', tuyaSchema)

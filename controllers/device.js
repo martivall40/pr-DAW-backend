@@ -4,6 +4,7 @@ const Home = require('../models/home')
 const User = require('../models/user')
 const Device = require('../models/device')
 const DeviceTypePlug = require('../models/deviceTypePlug')
+const Tuya = require('../models/tuya')
 
 const Relations = require('../models/relations')
 
@@ -21,20 +22,34 @@ const controller = {
       const device = new Device()
       device.name = req.body.name
       device.typeString = req.body.typeString.toLowerCase()
-      device.virtual = req.body.virtual
+      device.real = req.body.real
       device.home = home
+      device.providerString = req.body.providerString.toLowerCase()
+
 
       let deviceType
-      let collection
+      let collectionType
 
+      let deviceProvider = null
+      let collectionProvider
+
+      // afegir tipus de dispositiu general
       if (device.typeString == 'plug') {
-        collection = "deviceTypePlug"
+        collectionType = "deviceTypePlug"
         deviceType = new DeviceTypePlug()
         deviceType.type = "plug"
         deviceType.open = false
       } else{
         return res.status(500).send({ message: 'Falta el tipo de dispositiu' })
       }
+
+      // afegir tipus de proveidor
+      if (device.providerString == 'tuya') {
+        collectionProvider = "tuya"
+        deviceProvider = new Tuya()
+        deviceProvider.key = req.body.key
+        deviceProvider.open = false
+      } 
 
       deviceType.save()
         .then(typeStored => {
@@ -43,7 +58,16 @@ const controller = {
           device.deviceType = typeStored._id
           console.log("device.deviceType")
           console.log(device.deviceType)
-          device.type = collection
+          device.type = collectionType
+
+          // comprovar si hi ha provider i guardar
+
+          if(deviceProvider){
+            deviceProvider.save()
+              .then(providerStored => {
+                
+                })
+          }
 
           return device.save()
             .then(deviceStored => {
@@ -89,7 +113,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dades" })
+        return res.status(500).send({ message: "error al retornar les dades" })
         
       })
     }).catch((err) => {
@@ -118,7 +142,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dades" })
+        return res.status(500).send({ message: "error al retornar les dades" })
         
       })
     }).catch((err) => {
@@ -145,7 +169,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        return res.status(500).send({ message: "error al retornar les dades" })
         
       })
     }).catch((err) => {
@@ -173,7 +197,7 @@ const controller = {
         })
       }).catch((err) => {
         console.error(err)
-        return res.status(500).send({ message: "'error al retornar les dadesa" })
+        return res.status(500).send({ message: "error al retornar les dadesa" })
         
       })
     }).catch((err) => {

@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 
 const deviceSchema = mongoose.Schema({
   name: { type: String },
-  virtual: {type: Boolean, default: true},
+  real: {type: Boolean, default: false},
   home: {type: mongoose.Types.ObjectId, ref: "Home"},
 
 
