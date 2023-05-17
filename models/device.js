@@ -14,7 +14,7 @@ const deviceSchema = mongoose.Schema({
 
   providerString: { type: String },
   deviceProvider: {type: mongoose.Types.ObjectId, refPath: "provider"},
-  provider: { type: String, enum: ['tuya']},
+  provider: { type: String, enum: ['providerTuya']},
 
 
 })

@@ -2,13 +2,13 @@
 
 const mongoose = require('mongoose')
 
-const tuyaSchema = mongoose.Schema({
+const providerTuyaSchema = mongoose.Schema({
   key: { type: String },
   
 
   typeString: { type: String },
   deviceType: { type: mongoose.Types.ObjectId, refPath: "type"}, // id document
-  type: { type: String, required: true, enum: ['tuyaTypePlug']}, // deviceTypePlug
+  type: { type: String, required: true, enum: ['providerTuyaTypePlug']}, // deviceTypePlug
 
 
   // una sola collecio
@@ -18,4 +18,4 @@ const tuyaSchema = mongoose.Schema({
 
 })
 
-module.exports = mongoose.model('Tuya', tuyaSchema)
+module.exports = mongoose.model('providerTuya', providerTuyaSchema)

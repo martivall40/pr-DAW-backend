@@ -4,7 +4,8 @@ const Home = require('../models/home')
 const User = require('../models/user')
 const Device = require('../models/device')
 const DeviceTypePlug = require('../models/deviceTypePlug')
-const Tuya = require('../models/tuya')
+const ProviderTuya = require('../models/providerTuya')
+const ProviderTuyaTypePlug = require('../models/providerTuyaTypePlug')
 
 const Relations = require('../models/relations')
 
@@ -20,11 +21,12 @@ const controller = {
       if (userId != home.user) return res.status(401).send({ message: 'Prohibit' })
 
       const device = new Device()
+      // console.log(req.body)
       device.name = req.body.name
-      device.typeString = req.body.typeString.toLowerCase()
-      device.real = req.body.real
+      device.typeString = req.body.typeString?.toLowerCase()
+      device.real = req.body.real ? req.body.real : false
       device.home = home
-      device.providerString = req.body.providerString.toLowerCase()
+      device.providerString = req.body.providerString?.toLowerCase()
 
 
       let deviceType
@@ -32,6 +34,11 @@ const controller = {
 
       let deviceProvider = null
       let collectionProvider
+
+      let providerType = null
+      let collectionProviderType = null
+
+
 
       // afegir tipus de dispositiu general
       if (device.typeString == 'plug') {
@@ -43,33 +50,71 @@ const controller = {
         return res.status(500).send({ message: 'Falta el tipo de dispositiu' })
       }
 
-      // afegir tipus de proveidor
+      // afegir tipus de proveidor i tipus
       if (device.providerString == 'tuya') {
-        collectionProvider = "tuya"
-        deviceProvider = new Tuya()
+        collectionProvider = "providerTuya"
+        deviceProvider = new ProviderTuya()
         deviceProvider.key = req.body.key
         deviceProvider.open = false
+
+        if(device.typeString == 'plug'){
+        collectionProviderType = "providerTuyaTypePlug"
+        providerType = new ProviderTuyaTypePlug()
+        providerType.type = "plug"
+        providerType.open = false
+
+        }
+
       } 
 
+      // primer guardar tipus de dispositiu 
       deviceType.save()
         .then(typeStored => {
-          if(!typeStored)  return res.status(404).send({ message: 'No existeix el tipo' })
+          if(!typeStored)  return res.status(404).send({ message: 'No s\'ha pogut guardar' })
 
           device.deviceType = typeStored._id
-          console.log("device.deviceType")
-          console.log(device.deviceType)
           device.type = collectionType
 
-          // comprovar si hi ha provider i guardar
+          // comprovar si hi ha provider i tipus per guardar
 
-          if(deviceProvider){
-            deviceProvider.save()
-              .then(providerStored => {
-                
+          if(deviceProvider && providerType){
+
+            providerType.save().then(providerTypeSaved =>{
+              if(!providerTypeSaved)  return res.status(404).send({ message: 'No s\'ha pogut guardar' })
+
+              deviceProvider.deviceType = providerTypeSaved._id
+              deviceProvider.type = collectionProviderType
+
+              deviceProvider.save().then(providerStored => {
+                if(!providerStored)  return res.status(404).send({ message: 'No existeix el tipo' })
+                 
+                device.deviceProvider = providerStored._id
+                device.provider = collectionProvider
+
+                return device.save()
+                  .then(deviceStored => {
+                    if(!deviceStored)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+                    return res.status(200).send({ device: deviceStored })})
+                  .catch(err => {
+                    console.log(err)
+                    res.status(500).send({ message: 'ha fallat al crear el dispositiu' })
                 })
-          }
+              
+              }).catch(err => {
+                console.log(err)
+                res.status(500).send({ message: 'ha fallat al crear el dispositiu' })
+              })
 
-          return device.save()
+            }).catch(err => {
+              console.log(err)
+              res.status(500).send({ message: 'ha fallat al crear el dispositiu' })
+            })
+
+
+          // sense provider
+          }else{
+
+            return device.save()
             .then(deviceStored => {
               if(!deviceStored)  return res.status(404).send({ message: 'No existeix el dispositiu' })
               return res.status(200).send({ device: deviceStored })})
@@ -77,6 +122,9 @@ const controller = {
               console.log(err)
               res.status(500).send({ message: 'ha fallat al crear el dispositiu' })
             })
+          }
+
+          
         })
         .catch(err => {
           console.log(err)
