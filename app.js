@@ -24,6 +24,7 @@ const userRoutes = require('./routes/user')
 const priceRoutes = require('./routes/price')
 const homeRoutes = require('./routes/home')
 const deviceRoutes = require('./routes/device')
+const logRoutes = require('./routes/log')
 
 // middlewares
 
@@ -35,6 +36,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/price', priceRoutes)
 app.use('/api/home', homeRoutes)
 app.use('/api/device', deviceRoutes)
+app.use('/api/log', logRoutes)
 
 // carregar funcions programades
 scheduledFunctions.initScheduledJobs()
