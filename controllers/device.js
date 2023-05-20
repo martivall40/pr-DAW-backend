@@ -2,6 +2,7 @@
 
 const Home = require('../models/home')
 const User = require('../models/user')
+const Log = require('../models/log')
 const Device = require('../models/device')
 const DeviceTypePlug = require('../models/deviceTypePlug')
 const DeviceTypeLight = require('../models/deviceTypeLight')
@@ -201,7 +202,7 @@ const controller = {
       // Device.find({home:homeId}).then((device) => {
         Device.find({home:homeId}).populate([{ path: 'home', match:{user:  {$eq:userId}}},{path:'deviceType'}  ]).then((device) => {
         
-        // device = device.filter(dev=>dev.home!=null);
+        device = device.filter(dev=>dev.home!=null);
 
         if (!device) return res.status(404).send({ message: 'El dispositiu no existeix' })
 
@@ -221,59 +222,6 @@ const controller = {
   },
 
 
-  getHomes: function (req, res) {
-
-    const userId = req.userId
-    User.findById(userId).then((user) => {
-      // console.log(user)
-
-      if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
-
-      Home.find({user:userId}).then((home) => {
-        
-        if (!home) return res.status(404).send({ message: 'L\'ubicació no existeix' })
-
-        return res.status(200).send({
-          home
-        })
-      }).catch((err) => {
-        console.error(err)
-        return res.status(500).send({ message: "error al retornar les dades" })
-        
-      })
-    }).catch((err) => {
-      // console.error(err)
-      return res.status(500).send({ message: "Usuari no existent" })
-    })
-  },
-
-
-  getHome: function (req, res) {
-
-    const homeId = req.params.id
-    const userId = req.userId
-    User.findById(userId).then((user) => {
-      // console.log(user)
-
-      if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
-
-      Home.find({user:userId,_id:homeId}).then((home) => {
-        
-        if (!home) return res.status(404).send({ message: 'L\'ubicació no existeix' })
-
-        return res.status(200).send({
-          home:home
-        })
-      }).catch((err) => {
-        console.error(err)
-        return res.status(500).send({ message: "error al retornar les dadesa" })
-        
-      })
-    }).catch((err) => {
-      // console.error(err)
-      return res.status(500).send({ message: "Usuari no existent" })
-    })
-  },
 
   updateDevice: function (req, res) {
     const userId = req.userId
@@ -340,20 +288,43 @@ const controller = {
 
       let open={open:!device.deviceType.open}
 
+      const log = Log()
+      log.message = `Canviat estat del ${device.typeString} ${device.name} a ${(open.open)? 'obert':'tancat'}`
+      log.type = (open.open)? 'Obrir':'Tancar'
+      log.typeDevice = device.typeString
+      log.status = open.open
+      log.device = device
+      log.deviceName = device.name
+      log.real = device.real
+      log.date = new Date()
 
-      return collectionType.findByIdAndUpdate(device.deviceType._id,open,{new:true})
+      // guardar log
+      log.save().then(logStored => {
+        
+        if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
+        
+        // guardar estat
+        return collectionType.findByIdAndUpdate(device.deviceType._id,open,{new:true})
         .then(deviceSaved => {
           if(!deviceSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
           res.status(200).send({ deviceType: deviceSaved })})
         .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
+        
+      }).catch(err => {
+        console.error(err)
+        return res.status(500).send({ message: 'alguna cosa ha fallat' })
+      })
+
+
+      
 
       // return res.status(200).send({ device: device })
 
-      return Device.findByIdAndUpdate(deviceId,device,{new:true}).populate('deviceType')
+      /* return Device.findByIdAndUpdate(deviceId,device,{new:true}).populate('deviceType')
         .then(deviceSaved => {
           if(!deviceSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
           res.status(200).send({ device: deviceSaved })})
-        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
+        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' })) */
 
     }).catch((err) => {
       return res.status(500).send({ message: "Usuari no existent" })
