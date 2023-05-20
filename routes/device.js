@@ -18,4 +18,7 @@ router.put('/:id?', checkToken, DeviceController.updateDevice)
 // router.get('/:id?', checkToken, DeviceController.getDevice)
 router.delete('/:id?', checkToken, DeviceController.deleteDevice)
 
+router.get('/swapStatus/:id', checkToken, DeviceController.swapStatus)
+
+
 module.exports = router

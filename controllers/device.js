@@ -9,6 +9,7 @@ const ProviderTuyaTypePlug = require('../models/providerTuyaTypePlug')
 
 const Relations = require('../models/relations')
 
+
 const controller = {
 
   createDevice: function (req, res) {
@@ -42,7 +43,7 @@ const controller = {
 
       // afegir tipus de dispositiu general
       if (device.typeString == 'plug') {
-        collectionType = "deviceTypePlug"
+        collectionType = "DeviceTypePlug"
         deviceType = new DeviceTypePlug()
         deviceType.type = "plug"
         deviceType.open = false
@@ -52,13 +53,13 @@ const controller = {
 
       // afegir tipus de proveidor i tipus
       if (device.providerString == 'tuya') {
-        collectionProvider = "providerTuya"
+        collectionProvider = "ProviderTuya"
         deviceProvider = new ProviderTuya()
         deviceProvider.key = req.body.key
         deviceProvider.open = false
 
         if(device.typeString == 'plug'){
-        collectionProviderType = "providerTuyaTypePlug"
+        collectionProviderType = "ProviderTuyaTypePlug"
         providerType = new ProviderTuyaTypePlug()
         providerType.type = "plug"
         providerType.open = false
@@ -149,13 +150,15 @@ const controller = {
 
       
         // Device.find().populate('home',null,{user:userId}).then((device) => {
-        Device.find().populate({ path: 'home', match:{user:  {$eq:userId}}  }).then((device) => {
+        Device.find().populate([{ path: 'home', match:{user:  {$eq:userId}}}, {path:'deviceType'}  ]).then((device) => {
         // Device.find().populate('home', {path: 'home',match: { user: userId }}).then((device) => {
 
         device = device.filter(dev=>dev.home!=null)
         
         if (!device) return res.status(404).send({ message: 'El dispositiu no existeix' })
+
   
+        
         return res.status(200).send({
           device
         })
@@ -179,11 +182,12 @@ const controller = {
       if (!user) return res.status(404).send({ message: 'No existeix l\'usuari' })
 
       // Device.find({home:homeId}).then((device) => {
-        Device.find({home:homeId}).populate({ path: 'home', match:{user:  {$eq:userId}}  }).then((device) => {
+        Device.find({home:homeId}).populate([{ path: 'home', match:{user:  {$eq:userId}}},{path:'deviceType'}  ]).then((device) => {
         
         // device = device.filter(dev=>dev.home!=null);
 
         if (!device) return res.status(404).send({ message: 'El dispositiu no existeix' })
+
   
         return res.status(200).send({
           device
@@ -195,7 +199,7 @@ const controller = {
       })
     }).catch((err) => {
       // console.error(err)
-      return res.status(500).send({ message: "Usuari no existent" })
+      return res.status(500).send({ message: "Alguna cosa ha fallat" })
     })
   },
 
@@ -290,6 +294,48 @@ const controller = {
         .then(deviceRemoved => {
           if(!deviceRemoved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
           res.status(200).send({ device: deviceRemoved })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
+
+    }).catch((err) => {
+      return res.status(500).send({ message: "Usuari no existent" })
+    })
+
+
+  },
+
+  swapStatus: function (req, res) {
+    const deviceId = req.params.id
+    const userId = req.userId
+
+    Device.findById(deviceId).populate([{path:'home'},{path:'deviceType'}]).then((device) => {
+      // comprovar usuari
+      if (!device) return res.status(404).send({ message: 'No existeix el dispositiu' })
+      if (userId != device.home.user) return res.status(401).send({ message: 'Prohibit' })
+      
+      let collectionType
+      let deviceType
+
+      if (device.typeString == "plug"){
+        collectionType = DeviceTypePlug
+        deviceType = DeviceTypePlug
+      }else{return res.status(401).send({ message: 'Error' })}
+        
+
+      let open={open:!device.deviceType.open}
+
+
+      return collectionType.findByIdAndUpdate(device.deviceType._id,open,{new:true})
+        .then(deviceSaved => {
+          if(!deviceSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+          res.status(200).send({ deviceType: deviceSaved })})
+        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
+
+      // return res.status(200).send({ device: device })
+
+      return Device.findByIdAndUpdate(deviceId,device,{new:true}).populate('deviceType')
+        .then(deviceSaved => {
+          if(!deviceSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+          res.status(200).send({ device: deviceSaved })})
         .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
 
     }).catch((err) => {

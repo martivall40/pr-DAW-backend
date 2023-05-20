@@ -8,7 +8,7 @@ const providerTuyaSchema = mongoose.Schema({
 
   typeString: { type: String },
   deviceType: { type: mongoose.Types.ObjectId, refPath: "type"}, // id document
-  type: { type: String, required: true, enum: ['providerTuyaTypePlug']}, // deviceTypePlug
+  type: { type: String, required: true, enum: ['ProviderTuyaTypePlug']}, // deviceTypePlug
 
 
   // una sola collecio
@@ -18,4 +18,4 @@ const providerTuyaSchema = mongoose.Schema({
 
 })
 
-module.exports = mongoose.model('providerTuya', providerTuyaSchema)
+module.exports = mongoose.model('ProviderTuya', providerTuyaSchema)
