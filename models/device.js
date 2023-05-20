@@ -10,7 +10,7 @@ const deviceSchema = mongoose.Schema({
 
   typeString: { type: String },
   deviceType: { type: mongoose.Types.ObjectId, refPath: "type"}, // id document
-  type: { type: String, required: true, enum: ['DeviceTypePlug']}, // deviceTypePlug
+  type: { type: String, enum: ['DeviceTypePlug','DeviceTypeLight']}, // deviceTypePlug
 
   providerString: { type: String },
   deviceProvider: {type: mongoose.Types.ObjectId, refPath: "provider"},

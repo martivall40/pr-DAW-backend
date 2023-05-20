@@ -4,6 +4,7 @@ const Home = require('../models/home')
 const User = require('../models/user')
 const Device = require('../models/device')
 const DeviceTypePlug = require('../models/deviceTypePlug')
+const DeviceTypeLight = require('../models/deviceTypeLight')
 const ProviderTuya = require('../models/providerTuya')
 const ProviderTuyaTypePlug = require('../models/providerTuyaTypePlug')
 
@@ -47,6 +48,22 @@ const controller = {
         deviceType = new DeviceTypePlug()
         deviceType.type = "plug"
         deviceType.open = false
+      }else if (device.typeString == 'light') {
+        collectionType = "DeviceTypeLight"
+        deviceType = new DeviceTypeLight()
+        deviceType.type = "light"
+        deviceType.open = false
+
+      }else if (device.typeString == 'esp32'){
+        return device.save()
+          .then(deviceStored => {
+            if(!deviceStored)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+            return res.status(200).send({ device: deviceStored })})
+          .catch(err => {
+            console.log(err)
+            res.status(500).send({ message: 'ha fallat al crear el dispositiu' })
+          })
+         
       } else{
         return res.status(500).send({ message: 'Falta el tipo de dispositiu' })
       }
@@ -313,11 +330,11 @@ const controller = {
       if (userId != device.home.user) return res.status(401).send({ message: 'Prohibit' })
       
       let collectionType
-      let deviceType
 
       if (device.typeString == "plug"){
         collectionType = DeviceTypePlug
-        deviceType = DeviceTypePlug
+      }else if (device.typeString == "light"){
+        collectionType = DeviceTypeLight
       }else{return res.status(401).send({ message: 'Error' })}
         
 
