@@ -318,8 +318,8 @@ const controller = {
             if(!device.deviceProvider.id) return res.status(404).send({ message: 'Falta ID de tuya' })
 
             const RealDevice = new TuyAPI({
-              id: device.deviceProvider.id,
-              key: device.deviceProvider.key,
+              id: device.deviceProvider.id, // bf4c1fda6abb57749e6azp
+              key: device.deviceProvider.key, // `P8QCkgv3zkEcUNV
               issueGetOnConnect: false});
             
             (async () => {
