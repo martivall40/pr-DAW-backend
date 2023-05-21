@@ -9,7 +9,9 @@ const DeviceTypeLight = require('../models/deviceTypeLight')
 const ProviderTuya = require('../models/providerTuya')
 const ProviderTuyaTypePlug = require('../models/providerTuyaTypePlug')
 
-const Relations = require('../models/relations')
+const TuyAPI = require('tuyapi');
+
+// const Relations = require('../models/relations')
 
 
 const controller = {
@@ -74,6 +76,7 @@ const controller = {
         collectionProvider = "ProviderTuya"
         deviceProvider = new ProviderTuya()
         deviceProvider.key = req.body.key
+        deviceProvider.id = req.body.id
         deviceProvider.open = false
 
         if(device.typeString == 'plug'){
@@ -272,10 +275,11 @@ const controller = {
     const deviceId = req.params.id
     const userId = req.userId
 
-    Device.findById(deviceId).populate([{path:'home'},{path:'deviceType'}]).then((device) => {
+    Device.findById(deviceId).populate([{path:'home'},{path:'deviceType'},{path:"deviceProvider", populate: {path:'deviceType'}}]).then((device) => {
       // comprovar usuari
       if (!device) return res.status(404).send({ message: 'No existeix el dispositiu' })
       if (userId != device.home.user) return res.status(401).send({ message: 'Prohibit' })
+
       
       let collectionType
 
@@ -295,8 +299,71 @@ const controller = {
       log.status = open.open
       log.device = device
       log.deviceName = device.name
-      log.real = device.real
+      log.real = false
       log.date = new Date()
+
+
+      let collectionProvider = null
+      let providerType = null
+      if(device.real){
+        
+        if(device.providerString === 'tuya'){
+          collectionProvider = ProviderTuya
+          device.deviceProvider.deviceType.open = log.status
+
+          if(device.deviceProvider.deviceType.type == "plug"){
+            providerType = ProviderTuyaTypePlug
+
+            if(!device.deviceProvider.key) return res.status(404).send({ message: 'Falta KEY de tuya' })
+            if(!device.deviceProvider.id) return res.status(404).send({ message: 'Falta ID de tuya' })
+            const RealDevice = new TuyAPI({
+              id: device.deviceProvider.id, // 'bf4c1fda6abb57749e6azp'
+              key: device.deviceProvider.key}); //`P8QCkgv3zkEcUNV
+
+              let stateHasChanged = false;
+
+              // Find device on network
+              RealDevice.find().then(() => {
+                // Connect to device
+                RealDevice.connect();
+              });
+
+              // Add event listeners
+              RealDevice.on('connected', () => {
+                console.log('Connected to device!');
+              });
+
+              RealDevice.on('disconnected', () => {
+                console.log('Disconnected from device.');
+              });
+
+              RealDevice.on('error', error => {
+                console.log('Error!', error);
+              });
+
+              RealDevice.on('data', data => {
+                console.log('Data from device:', data);
+
+                console.log(`Boolean status of default property: ${data.dps['1']}.`);
+
+                // Set default property to opposite
+                if (!stateHasChanged) {
+                  RealDevice.set({set: !(data.dps['1'])});
+
+                  // Otherwise we'll be stuck in an endless
+                  // loop of toggling the state.
+                  stateHasChanged = true;
+                }
+              });
+
+              // Disconnect after 10 seconds
+              setTimeout(() => { RealDevice.disconnect(); }, 10000);
+
+
+
+          }
+        }
+      }
 
       // guardar log
       log.save().then(logStored => {
@@ -304,11 +371,61 @@ const controller = {
         if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
         
         // guardar estat
-        return collectionType.findByIdAndUpdate(device.deviceType._id,open,{new:true})
-        .then(deviceSaved => {
-          if(!deviceSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
-          res.status(200).send({ deviceType: deviceSaved })})
-        .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' }))
+        collectionType.findByIdAndUpdate(device.deviceType._id,open,{new:true})
+        .then(typeSaved => {
+          if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+          if (!device.real) return res.status(200).send({ deviceType: typeSaved })
+        
+        
+          if (device.real) {   
+            
+
+
+            if (collectionProvider!=null){
+              // console.log(device)
+              // return res.status(200).send({ deviceType: deviceSaved })
+              // collectionProvider.findById()
+
+              const logR = Log()
+              logR.message = `Canviat estat Real del ${device.typeString} ${device.name} a ${(open.open)? 'obert':'tancat'}`
+              logR.type = (open.open)? 'Obrir':'Tancar'
+              logR.typeDevice = device.typeString
+              logR.status = open.open
+              logR.device = device
+              logR.deviceName = device.name
+              logR.real = true
+              logR.date = new Date()
+
+              logR.save().then(logStored => {
+        
+                if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
+
+                 // guardar estat
+                providerType.findByIdAndUpdate(device.deviceProvider.deviceType._id,open,{new:true})
+                .then(typeSaved => {
+                  if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+                  
+                  return res.status(200).send({ deviceType: typeSaved })
+                
+                }).catch(err => res.status(500).send({ message: 'ha fallat al actualitzar el proveidor' }))
+                
+              }).catch(err => {
+                console.log(err)
+                return res.status(500).send({ message: 'ha fallat al guardar el log real' })
+              })
+
+
+            }else{return res.status(401).send({ message: 'Error en actualitzar dispositiu' })}
+
+          }
+        
+        })
+
+          
+        .catch(err => {
+          console.log(err)
+          return res.status(500).send({ message: 'ha fallat al afegir el log virtualitzat' })
+        })
         
       }).catch(err => {
         console.error(err)
@@ -327,6 +444,7 @@ const controller = {
         .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' })) */
 
     }).catch((err) => {
+      console.log(err)
       return res.status(500).send({ message: "Usuari no existent" })
     })
 

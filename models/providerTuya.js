@@ -3,6 +3,7 @@
 const mongoose = require('mongoose')
 
 const providerTuyaSchema = mongoose.Schema({
+  id: { type: String },
   key: { type: String },
   
 

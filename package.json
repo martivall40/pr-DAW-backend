@@ -18,6 +18,7 @@
     "mongoose": "^7.0.5",
     "mongoose-unique-validator": "^4.0.0",
     "node-cron": "^3.0.2",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "tuyapi": "github:codetheweb/tuyapi"
   }
 }
