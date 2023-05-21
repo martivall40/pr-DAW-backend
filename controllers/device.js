@@ -324,17 +324,19 @@ const controller = {
             
             (async () => {
               await RealDevice.find();
-            
+              
               await RealDevice.connect();
+              
             
-              let status = await RealDevice.get();
             
-              console.log(`Current status: ${status}.`);
+              // let status = await RealDevice.get();
+            
+              // console.log(`Current status: ${status}.`);
             
               await RealDevice.set({set: open.open});
 
 
-              if (device.real) {   
+              if (device.real ) {   
 
                 if (collectionProvider!=null){
                   // console.log(device)
@@ -376,11 +378,13 @@ const controller = {
 
 
             
-              status = await RealDevice.get();
+              // status = await RealDevice.get();
             
-              console.log(`New status: ${status}.`);
+              // console.log(`New status: ${status}.`);
             
+                
               RealDevice.disconnect();
+             
             })();
             
             
@@ -480,6 +484,7 @@ const controller = {
         .then(typeSaved => {
           if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
           if (!device.real) return res.status(200).send({ deviceType: typeSaved })
+          if (device.real && collectionProvider==null) return res.status(200).send({ deviceType: typeSaved })
         
         
           
@@ -489,10 +494,13 @@ const controller = {
           
         .catch(err => {
           console.log(err)
+          // console.log(err.message)
+          // if (err.error.message)
           return res.status(500).send({ message: 'ha fallat al afegir el log virtualitzat' })
         })
         
       }).catch(err => {
+        // console.log(err.error.message)
         console.error(err)
         return res.status(500).send({ message: 'alguna cosa ha fallat' })
       })
@@ -509,7 +517,12 @@ const controller = {
         .catch(err => res.status(500).send({ message: 'ha fallat al borrar el dispositiu' })) */
 
     }).catch((err) => {
-      console.log(err)
+      // Object.getOwnPropertyNames(err)
+      // console.log(err.message)
+      if(err.message="Key is missing or incorrect."){
+        return res.status(500).send({ message: "KEY del dispositiu invalida" })
+      }
+      // console.log(err)
       return res.status(500).send({ message: "Usuari no existent" })
     })
 
