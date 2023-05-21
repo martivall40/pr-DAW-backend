@@ -316,11 +316,77 @@ const controller = {
 
             if(!device.deviceProvider.key) return res.status(404).send({ message: 'Falta KEY de tuya' })
             if(!device.deviceProvider.id) return res.status(404).send({ message: 'Falta ID de tuya' })
+
             const RealDevice = new TuyAPI({
+              id: device.deviceProvider.id,
+              key: device.deviceProvider.key,
+              issueGetOnConnect: false});
+            
+            (async () => {
+              await RealDevice.find();
+            
+              await RealDevice.connect();
+            
+              let status = await RealDevice.get();
+            
+              console.log(`Current status: ${status}.`);
+            
+              await RealDevice.set({set: open.open});
+
+
+              if (device.real) {   
+
+                if (collectionProvider!=null){
+                  // console.log(device)
+                  // return res.status(200).send({ deviceType: deviceSaved })
+                  // collectionProvider.findById()
+    
+                  const logR = Log()
+                  logR.message = `Canviat estat Real del ${device.typeString} ${device.name} a ${(open.open)? 'obert':'tancat'}`
+                  logR.type = (open.open)? 'Obrir':'Tancar'
+                  logR.typeDevice = device.typeString
+                  logR.status = open.open
+                  logR.device = device
+                  logR.deviceName = device.name
+                  logR.real = true
+                  logR.date = new Date()
+    
+                  logR.save().then(logStored => {
+            
+                    if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
+    
+                      // guardar estat
+                    providerType.findByIdAndUpdate(device.deviceProvider.deviceType._id,open,{new:true})
+                    .then(typeSaved => {
+                      if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+                      
+                      return res.status(200).send({ deviceType: typeSaved })
+                    
+                    }).catch(err => res.status(500).send({ message: 'ha fallat al actualitzar el proveidor' }))
+                    
+                  }).catch(err => {
+                    console.log(err)
+                    return res.status(500).send({ message: 'ha fallat al guardar el log real' })
+                  })
+    
+    
+                }else{return res.status(401).send({ message: 'Error en actualitzar dispositiu' })}
+    
+              }
+
+
+            
+              status = await RealDevice.get();
+            
+              console.log(`New status: ${status}.`);
+            
+              RealDevice.disconnect();
+            })();
+            
+            
+            /* const RealDevice = new TuyAPI({
               id: device.deviceProvider.id, // 'bf4c1fda6abb57749e6azp'
               key: device.deviceProvider.key}); //`P8QCkgv3zkEcUNV
-
-              let stateHasChanged = false;
 
               // Find device on network
               RealDevice.find().then(() => {
@@ -335,29 +401,68 @@ const controller = {
 
               RealDevice.on('disconnected', () => {
                 console.log('Disconnected from device.');
+                return res.status(404).send({ message: 'Ha fallat la conexió del dispositiu' })
               });
 
               RealDevice.on('error', error => {
                 console.log('Error!', error);
+                return res.status(404).send({ message: 'Ha fallat la conexió del dispositiu' })
               });
 
               RealDevice.on('data', data => {
                 console.log('Data from device:', data);
-
+                console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 console.log(`Boolean status of default property: ${data.dps['1']}.`);
 
-                // Set default property to opposite
-                if (!stateHasChanged) {
-                  RealDevice.set({set: !(data.dps['1'])});
+                // canviar estat
+                RealDevice.set({set: open.open});
 
-                  // Otherwise we'll be stuck in an endless
-                  // loop of toggling the state.
-                  stateHasChanged = true;
+
+                if (device.real) {   
+
+                  if (collectionProvider!=null){
+                    // console.log(device)
+                    // return res.status(200).send({ deviceType: deviceSaved })
+                    // collectionProvider.findById()
+      
+                    const logR = Log()
+                    logR.message = `Canviat estat Real del ${device.typeString} ${device.name} a ${(open.open)? 'obert':'tancat'}`
+                    logR.type = (open.open)? 'Obrir':'Tancar'
+                    logR.typeDevice = device.typeString
+                    logR.status = open.open
+                    logR.device = device
+                    logR.deviceName = device.name
+                    logR.real = true
+                    logR.date = new Date()
+      
+                    logR.save().then(logStored => {
+              
+                      if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
+      
+                        // guardar estat
+                      providerType.findByIdAndUpdate(device.deviceProvider.deviceType._id,open,{new:true})
+                      .then(typeSaved => {
+                        if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
+                        
+                        return res.status(200).send({ deviceType: typeSaved })
+                      
+                      }).catch(err => res.status(500).send({ message: 'ha fallat al actualitzar el proveidor' }))
+                      
+                    }).catch(err => {
+                      console.log(err)
+                      return res.status(500).send({ message: 'ha fallat al guardar el log real' })
+                    })
+      
+      
+                  }else{return res.status(401).send({ message: 'Error en actualitzar dispositiu' })}
+      
                 }
+
+
               });
 
               // Disconnect after 10 seconds
-              setTimeout(() => { RealDevice.disconnect(); }, 10000);
+              setTimeout(() => { RealDevice.disconnect(); }, 10000); */
 
 
 
@@ -377,47 +482,7 @@ const controller = {
           if (!device.real) return res.status(200).send({ deviceType: typeSaved })
         
         
-          if (device.real) {   
-            
-
-
-            if (collectionProvider!=null){
-              // console.log(device)
-              // return res.status(200).send({ deviceType: deviceSaved })
-              // collectionProvider.findById()
-
-              const logR = Log()
-              logR.message = `Canviat estat Real del ${device.typeString} ${device.name} a ${(open.open)? 'obert':'tancat'}`
-              logR.type = (open.open)? 'Obrir':'Tancar'
-              logR.typeDevice = device.typeString
-              logR.status = open.open
-              logR.device = device
-              logR.deviceName = device.name
-              logR.real = true
-              logR.date = new Date()
-
-              logR.save().then(logStored => {
-        
-                if (!logStored) return res.status(404).send({ message: 'alguna cosa ha fallat' })
-
-                 // guardar estat
-                providerType.findByIdAndUpdate(device.deviceProvider.deviceType._id,open,{new:true})
-                .then(typeSaved => {
-                  if(!typeSaved)  return res.status(404).send({ message: 'No existeix el dispositiu' })
-                  
-                  return res.status(200).send({ deviceType: typeSaved })
-                
-                }).catch(err => res.status(500).send({ message: 'ha fallat al actualitzar el proveidor' }))
-                
-              }).catch(err => {
-                console.log(err)
-                return res.status(500).send({ message: 'ha fallat al guardar el log real' })
-              })
-
-
-            }else{return res.status(401).send({ message: 'Error en actualitzar dispositiu' })}
-
-          }
+          
         
         })
 
